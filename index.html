@@ -126,73 +126,51 @@ html, body {
 .back-title { font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:var(--navy); }
 .back-sub { font-size:11px; color:var(--text3); margin-top:1px; }
 
-/* ── UPDATED BOTTOM NAV ── */
-.bnav {
-  background: var(--white);
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-around; /* Distribute items evenly */
-  padding: 8px 12px;
-  /* Push to the absolute bottom */
-  padding-bottom: max(var(--safe-bot), 12px);
-  flex-shrink: 0;
-  position: relative;
-  z-index: 100;
-}
-
+/* ── UPDATED BOTTOM NAV BUBBLE ── */
 .bn-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 8px 16px;
-  border-radius: 24px; /* Creates the bubble shape */
+  padding: 8px 0;
+  border-radius: 16px; /* The bubble shape */
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 70px;
+  transition: all 0.2s ease;
+  margin: 0 4px; /* Space between bubbles */
 }
 
-/* The Blue Bubble Background for Active State */
+/* This makes the background blue for ANY active item */
 .bn-item.active {
-  background: var(--blue-l); /* Light blue bubble background */
+  background: var(--blue-l); /* Uses your #e8f0fe light blue */
 }
 
-/* Hide the old pip/dot since we are using a bubble now */
-.bn-pip {
-  display: none; 
+/* Ensure all icons within an active bubble turn blue */
+.bn-item.active .bn-icon {
+  color: var(--blue) !important;
+  stroke: var(--blue);
 }
 
-.bn-icon { 
-  width: 22px; 
-  height: 22px; 
-  transition: color 0.2s;
-}
-
-.bn-lbl { 
-  font-size: 11px; 
-  font-weight: 500; 
-  color: var(--text3); 
-}
-
-/* Active Colors */
-.bn-item.active .bn-lbl { 
-  color: var(--blue); 
-  font-weight: 700; 
-}
-
-.bn-item.active .bn-icon { 
-  color: var(--blue); 
-}
-
-.bn-item:not(.active) .bn-icon { 
-  color: var(--text3); 
-}
-
-/* Active icon should use fill if it's the Home icon to match the image */
-.bn-item.active .bn-icon[viewBox="0 0 24 24"] {
+/* Specifically for the Home icon which uses 'fill' */
+.bn-item.active svg[fill="currentColor"] {
   fill: var(--blue);
+}
+
+/* Hide the old pip dot */
+.bn-pip {
+  display: none;
+}
+
+.bn-lbl {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text3);
+}
+
+.bn-item.active .bn-lbl {
+  color: var(--blue);
+  font-weight: 700;
 }
 /* ── CONTENT ── */
 .content { padding:14px; }
