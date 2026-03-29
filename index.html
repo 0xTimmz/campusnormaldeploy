@@ -126,52 +126,33 @@ html, body {
 .back-title { font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:var(--navy); }
 .back-sub { font-size:11px; color:var(--text3); margin-top:1px; }
 
-/* ── UPDATED BOTTOM NAV BUBBLE ── */
+/* ── BOTTOM NAV ── */
+.bnav {
+  background:var(--white); border-top:1px solid var(--border);
+  display:flex; align-items:center;
+  padding:8px 8px 0;
+  padding-bottom: max(var(--safe-bot), 16px);
+  flex-shrink:0;
+}
 .bn-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 8px 0;
-  border-radius: 16px; /* The bubble shape */
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin: 0 4px; /* Space between bubbles */
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:4px; padding:6px 4px;
+  border-radius:12px; cursor:pointer;
+  transition:all 0.15s; position:relative;
 }
-
-/* This makes the background blue for ANY active item */
-.bn-item.active {
-  background: var(--blue-l); /* Uses your #e8f0fe light blue */
-}
-
-/* Ensure all icons within an active bubble turn blue */
-.bn-item.active .bn-icon {
-  color: var(--blue) !important;
-  stroke: var(--blue);
-}
-
-/* Specifically for the Home icon which uses 'fill' */
-.bn-item.active svg[fill="currentColor"] {
-  fill: var(--blue);
-}
-
-/* Hide the old pip dot */
 .bn-pip {
-  display: none;
+  position:absolute; top:4px;
+  width:4px; height:4px; border-radius:50%;
+  background:var(--blue); opacity:0; transition:opacity 0.15s;
 }
+.bn-item.active .bn-pip { opacity:1; }
+.bn-icon { width:22px; height:22px; }
+.bn-lbl { font-size:10px; font-weight:500; color:var(--text3); }
+.bn-item.active .bn-lbl { color:var(--blue); font-weight:600; }
+.bn-item.active .bn-icon { color:var(--blue); }
+.bn-item:not(.active) .bn-icon { color:var(--text3); }
 
-.bn-lbl {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--text3);
-}
-
-.bn-item.active .bn-lbl {
-  color: var(--blue);
-  font-weight: 700;
-}
 /* ── CONTENT ── */
 .content { padding:14px; }
 
