@@ -10,7 +10,8 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <title>CampusHub</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
@@ -500,12 +501,12 @@ html, body {
 .splash-logo {
   width:72px; height:72px; background:var(--blue); border-radius:22px;
   display:flex; align-items:center; justify-content:center;
-  font-family:'Sora',sans-serif; font-size:28px; font-weight:800; color:white;
+  font-family:'Sora',system-ui,sans-serif; font-size:28px; font-weight:800; color:white;
   margin-bottom:16px;
   animation:pop 0.5s cubic-bezier(0.34,1.6,0.64,1) 0.2s both;
 }
 @keyframes pop { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
-.splash-name { font-family:'Sora',sans-serif; font-size:26px; font-weight:800; color:white; animation:pop 0.5s cubic-bezier(0.34,1.6,0.64,1) 0.35s both; }
+.splash-name { font-family:'Sora',system-ui,sans-serif; font-size:26px; font-weight:800; color:white; animation:pop 0.5s cubic-bezier(0.34,1.6,0.64,1) 0.35s both; }
 .splash-tag  { font-size:13px; color:rgba(255,255,255,0.4); margin-top:6px; animation:pop 0.5s cubic-bezier(0.34,1.6,0.64,1) 0.45s both; }
 
 /* ── INSTALL BANNER ── */
@@ -1194,7 +1195,13 @@ function sendChip(el, text) {
 }
 
 // ── SPLASH ──
-setTimeout(() => document.getElementById('splash').classList.add('hidden'), 1800);
+// Hide splash immediately - don't wait for fonts
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const s = document.getElementById('splash');
+    if (s) s.classList.add('hidden');
+  }, 800);
+});
 
 // ── SERVICE WORKER ──
 if ('serviceWorker' in navigator) {
