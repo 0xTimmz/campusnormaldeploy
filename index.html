@@ -127,6 +127,27 @@ html, body {
 .back-sub { font-size:11px; color:var(--text3); margin-top:1px; }
 
 /* ── UPDATED BOTTOM NAV BUBBLE ── */
+.bnav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  padding: 8px 12px calc(8px + var(--safe-bot));
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -3px 16px rgba(10, 22, 40, 0.1);
+}
+
+.screen .scroll {
+  padding-bottom: calc(76px + var(--safe-bot));
+}
+
 .bn-item {
   flex: 1;
   display: flex;
@@ -147,6 +168,11 @@ html, body {
 }
 
 /* Ensure all icons within an active bubble turn blue */
+.bn-item .bn-icon {
+  color: var(--text3);
+  stroke: var(--text3);
+}
+
 .bn-item.active .bn-icon {
   color: var(--blue) !important;
   stroke: var(--blue);
@@ -1080,13 +1106,23 @@ let prevScreen = 'home';
 const screens = { home:'screen-home', timetable:'screen-timetable', ai:'screen-ai', feed:'screen-feed', notif:'screen-notif', entity:'screen-entity', lf:'screen-lf' };
 const navIdx = { home:0, timetable:1, ai:2, feed:3 };
 
+// assign nav data keys to each bottom nav item for consistent active highlighting
+const navKeys = Object.keys(navIdx);
+document.querySelectorAll('.bn-item').forEach((el,i) => {
+  if (!el.dataset.screen && navKeys[i]) el.dataset.screen = navKeys[i];
+});
+
 function goTo(key) {
   if (!key || !screens[key]) return;
   const cur = document.querySelector('.screen.active');
   if (cur) { prevScreen = cur.id.replace('screen-',''); cur.classList.remove('active'); }
   const next = document.getElementById(screens[key]);
   if (next) { next.classList.add('active'); next.querySelector('.scroll')?.scrollTo(0,0); }
-  document.querySelectorAll('.bn-item').forEach((el,i) => el.classList.toggle('active', i === navIdx[key]));
+
+  document.querySelectorAll('.bn-item').forEach((el,i) => {
+    const isSelected = (el.dataset.screen === key) || (navIdx[key] === i);
+    el.classList.toggle('active', isSelected);
+  });
 }
 
 // ── DRAWER ──
