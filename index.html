@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CampusHub">
+<meta name="theme-color" content="#0A1628">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<title>CampusHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+:root {
+  --navy:   #0a1628;
+  --blue:   #1a6cf0;
+  --blue-l: #e8f0fe;
+  --blue-m: #3b82f6;
+  --green:  #10b981;
+  --green-l:#dcfce7;
+  --red:    #ef4444;
+  --red-l:  #fee2e2;
+  --amber:  #f59e0b;
+  --amber-l:#fff7ed;
+  --purple-l:#f3e8ff;
+  --white:  #ffffff;
+  --bg:     #f0f4ff;
+  --border: #e2e8f0;
+  --text:   #0a1628;
+  --text2:  #4a5568;
+  --text3:  #94a3b8;
+  --shadow: 0 4px 24px rgba(10,22,40,0.08);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+
+html, body {
+  height: 100%; width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  background: var(--bg);
+  padding-top: var(--safe-top);
+}
+
+.screen { display:none; flex-direction:column; flex:1; overflow:hidden; }
+.screen.active { display:flex; }
+
+.scroll {
+  flex:1; overflow-y:auto; overflow-x:hidden;
+  -webkit-overflow-scrolling:touch; scrollbar-width:none;
+}
+.scroll::-webkit-scrollbar { display:none; }
+
+/* ── TOP BAR ── */
+.top-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 16px; height: 56px;
+  flex-shrink: 0; z-index: 10;
+}
+.hamburger {
+  width: 36px; height: 36px;
+  display: flex; flex-direction: column;
+  justify-content: center; gap: 5px;
+  cursor: pointer; border-radius: 10px;
+  padding: 6px; transition: background 0.15s;
+  margin-right: 8px; flex-shrink: 0;
+}
+.hamburger:active { background: var(--blue-l); }
+.hamburger span { display:block; height:2px; background:var(--navy); border-radius:2px; }
+.hamburger span:nth-child(1) { width:20px; }
+.hamburger span:nth-child(2) { width:14px; }
+.hamburger span:nth-child(3) { width:17px; }
+
+.tb-greeting { flex:1; }
+.tb-name { font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:var(--navy); }
+.tb-sub  { font-size:11px; color:var(--text3); margin-top:1px; }
+
+.tb-icons { display:flex; gap:6px; align-items:center; }
+.icon-btn {
+  width:36px; height:36px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:background 0.15s; position:relative;
+}
+.icon-btn:active { background:var(--blue-l); }
+.icon-btn svg { width:20px; height:20px; color:var(--navy); }
+.notif-dot {
+  position:absolute; top:7px; right:7px;
+  width:8px; height:8px; border-radius:50%;
+  background:var(--red); border:2px solid white;
+}
+.avatar-btn {
+  width:34px; height:34px; border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),#6366f1);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Sora',sans-serif; font-size:13px; font-weight:700; color:white;
+  cursor:pointer;
+}
+
+/* back bar */
+.back-bar {
+  background:var(--white); border-bottom:1px solid var(--border);
+  display:flex; align-items:center;
+  padding:0 16px; height:54px;
+  gap:10px; flex-shrink:0;
+}
+.back-btn {
+  width:34px; height:34px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:background 0.15s; flex-shrink:0;
+}
+.back-btn:active { background:var(--blue-l); }
+.back-btn svg { width:20px; height:20px; color:var(--navy); }
+.back-title { font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:var(--navy); }
+.back-sub { font-size:11px; color:var(--text3); margin-top:1px; }
+
+/* ── BOTTOM NAV ── */
+.bnav {
+  background:var(--white); border-top:1px solid var(--border);
+  display:flex; align-items:center;
+  padding:8px 8px 0;
+  padding-bottom: max(var(--safe-bot), 16px);
+  flex-shrink:0;
+}
+.bn-item {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:4px; padding:6px 4px;
+  border-radius:12px; cursor:pointer;
+  transition:all 0.15s; position:relative;
+}
+.bn-pip {
+  position:absolute; top:4px;
+  width:4px; height:4px; border-radius:50%;
+  background:var(--blue); opacity:0; transition:opacity 0.15s;
+}
+.bn-item.active .bn-pip { opacity:1; }
+.bn-icon { width:22px; height:22px; }
+.bn-lbl { font-size:10px; font-weight:500; color:var(--text3); }
+.bn-item.active .bn-lbl { color:var(--blue); font-weight:600; }
+.bn-item.active .bn-icon { color:var(--blue); }
+.bn-item:not(.active) .bn-icon { color:var(--text3); }
+
+/* ── CONTENT ── */
+.content { padding:14px; }
+
+/* ── ALERT ── */
+.alert-banner {
+  background:linear-gradient(135deg,#fff1f0,#ffe4e4);
+  border:1px solid #fecaca; border-radius:12px;
+  padding:12px 14px; margin-bottom:12px;
+  display:flex; gap:10px; align-items:flex-start;
+}
+.alert-icon { font-size:18px; flex-shrink:0; }
+.alert-text { font-size:12px; color:#991b1b; line-height:1.5; }
+.alert-text strong { font-weight:700; display:block; margin-bottom:2px; font-size:13px; }
+
+/* ── CARDS ── */
+.card {
+  background:var(--white); border-radius:16px;
+  padding:16px; margin-bottom:12px;
+  box-shadow:var(--shadow); border:1px solid var(--border);
+}
+.card-title {
+  font-family:'Sora',sans-serif; font-size:13px; font-weight:700; color:var(--navy);
+  margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;
+}
+.see-all { font-size:11px; color:var(--blue); font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; }
+
+/* ── CLASS ITEMS ── */
+.class-item {
+  display:flex; align-items:center;
+  padding:10px 0; border-bottom:1px solid var(--border); gap:10px;
+}
+.class-item:last-child { border-bottom:none; padding-bottom:0; }
+.class-time { width:46px; flex-shrink:0; }
+.ct-t { font-family:'Sora',sans-serif; font-size:12px; font-weight:700; color:var(--navy); }
+.ct-a { font-size:10px; color:var(--text3); }
+.class-bar { width:3px; height:30px; border-radius:2px; flex-shrink:0; }
+.class-info { flex:1; min-width:0; }
+.class-name { font-size:13px; font-weight:600; color:var(--text); }
+.class-meta { font-size:11px; color:var(--text3); margin-top:2px; }
+.badge {
+  font-size:10px; font-weight:700; padding:3px 9px;
+  border-radius:20px; white-space:nowrap; flex-shrink:0;
+}
+.b-now       { background:var(--green-l); color:#166534; }
+.b-next      { background:var(--blue-l);  color:#1e40af; }
+.b-cancelled { background:var(--red-l);   color:#991b1b; }
+.b-done      { background:var(--bg);      color:var(--text3); }
+.b-upcoming  { background:var(--bg);      color:var(--text3); }
+.b-school    { background:var(--amber-l); color:#9a3412; }
+.b-club      { background:var(--purple-l);color:#6b21a8; }
+.b-class     { background:var(--blue-l);  color:#1e40af; }
+.b-hall      { background:var(--purple-l);color:#6b21a8; }
+.b-assign    { background:var(--red-l);   color:#991b1b; }
+.b-reminder  { background:var(--amber-l); color:#9a3412; }
+.b-event     { background:var(--blue-l);  color:#1e40af; }
+
+/* ── ASSIGN ITEMS ── */
+.assign-item {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:11px 0; border-bottom:1px solid var(--border);
+}
+.assign-item:last-child { border-bottom:none; }
+.assign-left { flex:1; }
+.assign-title  { font-size:13px; font-weight:600; color:var(--text); margin-bottom:3px; }
+.assign-source { font-size:11px; color:var(--text3); margin-bottom:4px; }
+.assign-due    { font-size:11px; font-weight:700; }
+.due-today  { color:var(--red); }
+.due-soon   { color:var(--amber); }
+.due-normal { color:var(--text3); }
+.mark-done {
+  background:var(--bg); border:1.5px solid var(--border);
+  border-radius:8px; padding:5px 10px; font-size:11px;
+  font-weight:700; cursor:pointer; color:var(--text2);
+  font-family:'DM Sans',sans-serif; transition:all 0.15s;
+  flex-shrink:0; align-self:center;
+}
+.mark-done.done { background:var(--green-l); border-color:var(--green); color:#065f46; }
+.mark-done:active { transform:scale(0.95); }
+
+/* ── EVENT ITEMS ── */
+.event-item {
+  display:flex; gap:12px; padding:10px 0;
+  border-bottom:1px solid var(--border);
+}
+.event-item:last-child { border-bottom:none; }
+.event-date {
+  width:42px; flex-shrink:0; background:var(--blue-l);
+  border-radius:10px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:6px 0;
+}
+.ed-day { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--blue); line-height:1; }
+.ed-mon { font-size:9px; font-weight:700; color:var(--blue); text-transform:uppercase; letter-spacing:0.5px; }
+.event-info { flex:1; }
+.event-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:3px; }
+.event-meta  { font-size:11px; color:var(--text3); }
+
+/* ── SECTION HEADER ── */
+.section-header {
+  font-family:'Sora',sans-serif; font-size:11px; font-weight:700;
+  color:var(--text3); letter-spacing:1px; text-transform:uppercase;
+  margin:4px 0 10px;
+}
+
+/* ── DAY TABS ── */
+.day-tabs { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; margin-bottom:14px; }
+.day-tabs::-webkit-scrollbar { display:none; }
+.day-tab {
+  flex-shrink:0; padding:8px 14px; border-radius:20px;
+  font-size:12px; font-weight:600; cursor:pointer;
+  background:var(--white); color:var(--text2);
+  border:1px solid var(--border); transition:all 0.18s;
+}
+.day-tab.active { background:var(--navy); color:white; border-color:var(--navy); }
+
+/* ── FEED FILTERS ── */
+.feed-filter { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; margin-bottom:14px; }
+.feed-filter::-webkit-scrollbar { display:none; }
+.filter-chip {
+  flex-shrink:0; padding:6px 14px; border-radius:20px;
+  font-size:12px; font-weight:600; cursor:pointer;
+  background:var(--white); color:var(--text2);
+  border:1px solid var(--border); transition:all 0.18s;
+}
+.filter-chip.active { background:var(--navy); color:white; border-color:var(--navy); }
+
+/* ── ANN ITEMS ── */
+.ann-item { padding:12px 0; border-bottom:1px solid var(--border); }
+.ann-item:last-child { border-bottom:none; }
+.ann-header { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.ann-source { font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
+.src-class  { background:var(--blue-l);  color:#1e40af; }
+.src-hall   { background:var(--purple-l);color:#6b21a8; }
+.src-club   { background:var(--green-l); color:#166534; }
+.src-school { background:var(--amber-l); color:#9a3412; }
+.ann-time   { font-size:10px; color:var(--text3); margin-left:auto; }
+.ann-title  { font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px; }
+.ann-body   { font-size:12px; color:var(--text2); line-height:1.5; }
+.ann-actions { margin-top:8px; }
+.feed-done {
+  background:var(--green-l); border:1.5px solid var(--green);
+  border-radius:8px; padding:5px 10px; font-size:11px;
+  font-weight:700; cursor:pointer; color:#065f46;
+  font-family:'DM Sans',sans-serif; display:inline-block;
+}
+
+/* ── AI / HUBBY ── */
+.ai-header {
+  background:linear-gradient(135deg,var(--navy),#1a3a6b);
+  padding:20px 16px 24px; flex-shrink:0;
+}
+.ai-header h2 { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:white; }
+.ai-header p  { font-size:12px; color:#8ab4f8; margin-top:4px; }
+.ai-chips { display:flex; flex-wrap:wrap; gap:8px; padding:12px 14px 4px; flex-shrink:0; }
+.ai-chip {
+  padding:7px 13px; background:var(--white); border:1px solid var(--border);
+  border-radius:20px; font-size:12px; font-weight:600; color:var(--blue);
+  cursor:pointer; transition:all 0.15s; white-space:nowrap;
+}
+.ai-chip:active { background:var(--blue-l); }
+.chat-area {
+  flex:1; overflow-y:auto; padding:12px 14px;
+  display:flex; flex-direction:column; gap:12px;
+  -webkit-overflow-scrolling:touch; scrollbar-width:none;
+}
+.chat-area::-webkit-scrollbar { display:none; }
+.chat-bubble { max-width:82%; padding:10px 14px; border-radius:16px; font-size:13px; line-height:1.5; }
+.bubble-ai   { background:white; color:var(--text); border-bottom-left-radius:4px; box-shadow:var(--shadow); align-self:flex-start; }
+.bubble-user { background:var(--blue); color:white; border-bottom-right-radius:4px; align-self:flex-end; }
+.typing-wrap { align-self:flex-start; }
+.typing { display:flex; gap:5px; align-items:center; padding:12px 16px; background:white; border-radius:16px; border-bottom-left-radius:4px; box-shadow:var(--shadow); }
+.typing-dot { width:7px; height:7px; background:var(--text3); border-radius:50%; animation:bounce 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay:0.2s; }
+.typing-dot:nth-child(3) { animation-delay:0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+.chat-input-area {
+  padding:10px 14px; background:white;
+  border-top:1px solid var(--border);
+  display:flex; gap:8px; align-items:center; flex-shrink:0;
+}
+.chat-input {
+  flex:1; background:var(--bg); border:1px solid var(--border);
+  border-radius:20px; padding:10px 14px;
+  font-size:13px; font-family:'DM Sans',sans-serif;
+  outline:none; color:var(--text);
+}
+.chat-input:focus { border-color:var(--blue); }
+.chat-send {
+  width:38px; height:38px; border-radius:50%;
+  background:var(--blue); border:none;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0;
+}
+.chat-send svg { width:16px; height:16px; color:white; }
+.chat-send:active { opacity:0.85; }
+
+/* ── LOST & FOUND ── */
+.lf-tabs { display:flex; gap:8px; margin-bottom:14px; }
+.lf-tab {
+  flex:1; padding:9px; border-radius:10px; text-align:center;
+  font-size:12px; font-weight:600; cursor:pointer;
+  border:1.5px solid var(--border); color:var(--text2); transition:all 0.18s;
+}
+.lf-tab.active { background:var(--navy); color:white; border-color:var(--navy); }
+.lf-item {
+  display:flex; gap:12px; padding:12px 0;
+  border-bottom:1px solid var(--border);
+}
+.lf-item:last-child { border-bottom:none; }
+.lf-img {
+  width:54px; height:54px; border-radius:10px;
+  background:var(--bg); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:24px;
+}
+.lf-info { flex:1; }
+.lf-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:3px; }
+.lf-meta  { font-size:11px; color:var(--text3); margin-bottom:6px; }
+.lf-status { font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; display:inline-block; }
+.s-unclaimed { background:#fef9c3; color:#854d0e; }
+.s-claimed   { background:var(--blue-l); color:#1e40af; }
+.post-lf-btn {
+  width:100%; padding:13px; background:var(--blue); color:white;
+  border:none; border-radius:12px; font-size:14px; font-weight:700;
+  font-family:'DM Sans',sans-serif; cursor:pointer; margin-top:4px;
+  transition:opacity 0.15s;
+}
+.post-lf-btn:active { opacity:0.85; }
+
+/* ── NOTIF ── */
+.notif-item {
+  display:flex; gap:12px; padding:12px 0;
+  border-bottom:1px solid var(--border);
+}
+.notif-item:last-child { border-bottom:none; }
+.notif-item.unread { background:#f8faff; margin:0 -14px; padding:12px 14px; }
+.notif-dot-icon {
+  width:38px; height:38px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; flex-shrink:0;
+}
+.notif-text { flex:1; }
+.notif-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:3px; }
+.notif-body  { font-size:12px; color:var(--text2); line-height:1.4; }
+.notif-time  { font-size:10px; color:var(--text3); margin-top:4px; }
+.unread-dot  { width:8px; height:8px; border-radius:50%; background:var(--blue); flex-shrink:0; margin-top:6px; }
+
+/* ── ENTITY ── */
+.entity-header {
+  background:var(--navy);
+  padding:20px 16px 22px;
+  display:flex; flex-direction:column; align-items:center;
+  flex-shrink:0;
+}
+.entity-avatar {
+  width:64px; height:64px; border-radius:20px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; margin-bottom:10px;
+}
+.entity-name { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:white; margin-bottom:3px; }
+.entity-meta { font-size:12px; color:#8ab4f8; margin-bottom:14px; }
+.entity-stats { display:flex; gap:24px; margin-bottom:14px; }
+.e-stat { text-align:center; }
+.e-stat-n { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:white; }
+.e-stat-l { font-size:10px; color:#8ab4f8; }
+.follow-btn {
+  padding:10px 28px; border-radius:20px;
+  font-size:13px; font-weight:700; border:none; cursor:pointer;
+  font-family:'DM Sans',sans-serif; transition:all 0.15s;
+}
+.follow-btn.following { background:rgba(255,255,255,0.15); color:white; }
+.follow-btn.follow    { background:var(--blue); color:white; }
+
+/* ── QUICK ACTIONS ── */
+.quick-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.qa {
+  background:var(--white); border-radius:14px;
+  padding:14px; display:flex; flex-direction:column; gap:8px;
+  cursor:pointer; border:1px solid var(--border);
+  box-shadow:var(--shadow); transition:transform 0.15s;
+}
+.qa:active { transform:scale(0.97); }
+.qa-icon  { font-size:22px; }
+.qa-label { font-size:12px; font-weight:600; color:var(--text); }
+.qa-sub   { font-size:11px; color:var(--text3); }
+
+/* ── SIDE DRAWER ── */
+.drawer-overlay {
+  position:fixed; inset:0;
+  background:rgba(10,22,40,0.5);
+  z-index:100; display:none;
+  backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px);
+}
+.drawer-overlay.open { display:block; }
+.drawer {
+  position:absolute; left:0; top:0; bottom:0; width:280px;
+  background:var(--white); overflow-y:auto;
+  -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  transform:translateX(-100%);
+  transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:4px 0 32px rgba(10,22,40,0.15);
+}
+.drawer.open { transform:translateX(0); }
+.drawer::-webkit-scrollbar { display:none; }
+
+.drawer-profile {
+  padding:calc(var(--safe-top) + 50px) 20px 16px;
+  background:var(--navy);
+  display:flex; align-items:center; gap:12px;
+}
+.drawer-avatar {
+  width:46px; height:46px; border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),#6366f1);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:white;
+}
+.drawer-name  { font-family:'Sora',sans-serif; font-size:15px; font-weight:700; color:white; }
+.drawer-email { font-size:11px; color:#8ab4f8; margin-top:2px; }
+
+.drawer-section {
+  padding:12px 20px 6px;
+  font-size:10px; font-weight:700; color:var(--text3);
+  letter-spacing:1.2px; text-transform:uppercase;
+}
+.drawer-item {
+  display:flex; align-items:center; gap:10px;
+  padding:11px 20px; cursor:pointer; transition:background 0.15s;
+}
+.drawer-item:active { background:var(--blue-l); }
+.di-dot { width:8px; height:8px; border-radius:50%; background:var(--blue); flex-shrink:0; }
+.di-dot-purple { background:#a855f7; }
+.di-dot-green  { background:var(--green); }
+.di-label { font-size:14px; font-weight:500; color:var(--text); }
+.di-sub   { font-size:12px; color:var(--text2); }
+.di-arrow { margin-left:auto; font-size:14px; color:var(--text3); }
+.drawer-divider { height:1px; background:var(--border); margin:8px 20px; }
+.drawer-add { display:flex; align-items:center; gap:8px; padding:8px 20px 8px 38px; cursor:pointer; }
+.drawer-add span { font-size:12px; color:var(--blue); font-weight:600; }
+
+/* ── SPLASH ── */
+#splash {
+  position:fixed; inset:0; background:var(--navy);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  z-index:999; transition:opacity 0.5s, visibility 0.5s;
+}
+#splash.hidden { opacity:0; visibility:hidden; }
+.splash-logo {
+  width:72px; height:72px; background:var(--blue); border-radius:22px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Sora',sans-serif; font-size:28px; font-weight:800; color:white;
+  margin-bottom:16px;
+  animation:pop 0.5s cubic-bezier(0.34,1.6,0.64,1) 0.2s both;
+}
+@keyframes pop { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
+.splash-name { font-family:'Sora',sans-serif; font-size:26px; font-weight:800; color:white; animation:pop 0.5s cubic-bezier(0.34,1.6,0.64,1) 0.35s both; }
+.splash-tag  { font-size:13px; color:rgba(255,255,255,0.4); margin-top:6px; animation:pop 0.5s cubic-bezier(0.34,1.6,0.64,1) 0.45s both; }
+
+/* ── INSTALL BANNER ── */
+#install-banner {
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--navy); padding:14px 16px;
+  padding-bottom:calc(max(var(--safe-bot), 16px) + 14px);
+  display:none; align-items:center; gap:12px;
+  z-index:200; border-top:1px solid rgba(255,255,255,0.1);
+}
+#install-banner.show { display:flex; }
+.install-text { flex:1; font-size:13px; font-weight:700; color:white; }
+.install-text span { display:block; font-size:11px; color:rgba(255,255,255,0.5); margin-top:2px; }
+.install-btn { padding:9px 18px; background:var(--blue); color:white; border:none; border-radius:10px; font-size:13px; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; }
+.install-close { font-size:22px; color:rgba(255,255,255,0.4); cursor:pointer; padding:4px; }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">CH</div>
+  <div class="splash-name">CampusHub</div>
+  <div class="splash-tag">One App. Every Student. Every Campus.</div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <div class="install-text">Add to Home Screen <span>For the full app experience</span></div>
+  <button class="install-btn" id="install-btn">Install</button>
+  <span class="install-close" onclick="document.getElementById('install-banner').classList.remove('show')">×</span>
+</div>
+
+<!-- SIDE DRAWER -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()">
+  <div class="drawer" id="drawer" onclick="event.stopPropagation()">
+    <div class="drawer-profile">
+      <div class="drawer-avatar">T</div>
+      <div>
+        <div class="drawer-name">Timileyin</div>
+        <div class="drawer-email">timi@student.babcock.edu.ng</div>
+      </div>
+    </div>
+    <div class="drawer-section">My Class</div>
+    <div class="drawer-item" onclick="showEntity('class');closeDrawer()">
+      <div class="di-dot"></div>
+      <div><div class="di-label">CSC 300 — Computer Science</div></div>
+      <div class="di-arrow">›</div>
+    </div>
+    <div class="drawer-add" onclick="closeDrawer()"><span>+ Follow another class</span></div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-section">My Hall</div>
+    <div class="drawer-item" onclick="showEntity('hall');closeDrawer()">
+      <div class="di-dot di-dot-purple"></div>
+      <div><div class="di-label">Joshua Hall</div><div class="di-sub">Male Hall · 247 members</div></div>
+      <div class="di-arrow">›</div>
+    </div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-section">My Clubs</div>
+    <div class="drawer-item" onclick="showEntity('club');closeDrawer()">
+      <div class="di-dot di-dot-green"></div>
+      <div><div class="di-label">Tech Club Babcock</div><div class="di-sub">142 members</div></div>
+      <div class="di-arrow">›</div>
+    </div>
+    <div class="drawer-add"><span>+ Find a club</span></div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-item" onclick="goTo('lf');closeDrawer()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--blue);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <div><div class="di-label">Lost & Found</div></div>
+      <div class="di-arrow">›</div>
+    </div>
+    <div class="drawer-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--blue);flex-shrink:0"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+      <div><div class="di-label">Settings</div></div>
+      <div class="di-arrow">›</div>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+
+  <!-- ══ HOME ══ -->
+  <div class="screen active" id="screen-home">
+    <div class="top-bar">
+      <div class="hamburger" onclick="openDrawer()">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="tb-greeting">
+        <div class="tb-name">Good morning, Timi 👋</div>
+        <div class="tb-sub" id="today-date">Wednesday, March 11</div>
+      </div>
+      <div class="tb-icons">
+        <div class="icon-btn" onclick="goTo('notif')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div class="notif-dot"></div>
+        </div>
+        <div class="avatar-btn">T</div>
+      </div>
+    </div>
+
+    <div class="scroll" style="padding-bottom:8px;">
+      <div class="content">
+        <div class="alert-banner">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-text">
+            <strong>Class Cancelled</strong>
+            CSC 301 — Data Structures (10:00 AM) has been cancelled by your class rep.
+          </div>
+        </div>
+
+        <!-- Assignments -->
+        <div class="card">
+          <div class="card-title">📝 Upcoming Assignments <span class="see-all" onclick="goTo('feed')">See all →</span></div>
+          <div class="assign-item">
+            <div class="assign-left">
+              <div class="assign-title">Lab Report 2</div>
+              <div class="assign-source">🎓 CSC 301 · Class Rep</div>
+              <div class="assign-due due-today">Due today · 11:59 PM</div>
+            </div>
+            <button class="mark-done" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓ Done':'Mark done'">Mark done</button>
+          </div>
+          <div class="assign-item">
+            <div class="assign-left">
+              <div class="assign-title">Room Sanitation Check</div>
+              <div class="assign-source">🏛 Joshua Hall · Senator</div>
+              <div class="assign-due due-soon">Due tomorrow · 7:00 AM</div>
+            </div>
+            <button class="mark-done" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓ Done':'Mark done'">Mark done</button>
+          </div>
+          <div class="assign-item">
+            <div class="assign-left">
+              <div class="assign-title">Hackathon Submission</div>
+              <div class="assign-source">⚙️ Tech Club · Exec</div>
+              <div class="assign-due due-normal">Due Mar 14 · 6:00 PM</div>
+            </div>
+            <button class="mark-done" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓ Done':'Mark done'">Mark done</button>
+          </div>
+        </div>
+
+        <!-- Classes -->
+        <div class="card">
+          <div class="card-title">📅 Today's Classes <span class="see-all" onclick="goTo('timetable')">Full schedule →</span></div>
+          <div class="class-item">
+            <div class="class-time"><div class="ct-t">10:00</div><div class="ct-a">AM</div></div>
+            <div class="class-bar" style="background:var(--red)"></div>
+            <div class="class-info"><div class="class-name">CSC 301 · Data Structures</div><div class="class-meta">Room 201 · Dr. Okafor</div></div>
+            <span class="badge b-cancelled">CANCELLED</span>
+          </div>
+          <div class="class-item">
+            <div class="class-time"><div class="ct-t">12:00</div><div class="ct-a">PM</div></div>
+            <div class="class-bar" style="background:var(--green)"></div>
+            <div class="class-info"><div class="class-name">CSC 303 · Comp. Networks</div><div class="class-meta">LT4 · Prof. Adeyemi</div></div>
+            <span class="badge b-now">NOW</span>
+          </div>
+          <div class="class-item">
+            <div class="class-time"><div class="ct-t">2:00</div><div class="ct-a">PM</div></div>
+            <div class="class-bar" style="background:var(--blue)"></div>
+            <div class="class-info"><div class="class-name">CSC 305 · Software Eng.</div><div class="class-meta">Room 105 · Dr. Eze</div></div>
+            <span class="badge b-next">NEXT</span>
+          </div>
+          <div class="class-item">
+            <div class="class-time"><div class="ct-t">4:00</div><div class="ct-a">PM</div></div>
+            <div class="class-bar" style="background:var(--border)"></div>
+            <div class="class-info"><div class="class-name">CSC 307 · Database Sys.</div><div class="class-meta">LT2 · Dr. Nwosu</div></div>
+            <span class="badge b-upcoming">UPCOMING</span>
+          </div>
+        </div>
+
+        <!-- Events -->
+        <div class="card">
+          <div class="card-title">🎉 Upcoming Events <span class="see-all" onclick="goTo('feed')">See all →</span></div>
+          <div class="event-item">
+            <div class="event-date"><div class="ed-day">14</div><div class="ed-mon">MAR</div></div>
+            <div class="event-info"><div class="event-title">Tech Club Hackathon 2026</div><div class="event-meta">ICT Building · 9AM – 6PM</div></div>
+            <span class="badge b-club event-badge">CLUB</span>
+          </div>
+          <div class="event-item">
+            <div class="event-date"><div class="ed-day">18</div><div class="ed-mon">MAR</div></div>
+            <div class="event-info"><div class="event-title">Mid-Semester Exams Begin</div><div class="event-meta">All venues · Check timetable</div></div>
+            <span class="badge b-school event-badge">SCHOOL</span>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <div class="qa" onclick="goTo('ai')"><div class="qa-icon">🤖</div><div class="qa-label">Ask Hubby</div><div class="qa-sub">Campus AI assistant</div></div>
+          <div class="qa" onclick="goTo('lf')"><div class="qa-icon">🔍</div><div class="qa-label">Lost & Found</div><div class="qa-sub">3 new posts</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bnav">
+      <div class="bn-item active" onclick="goTo('home')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="bn-lbl">Home</span></div>
+      <div class="bn-item" onclick="goTo('timetable')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="bn-lbl">Timetable</span></div>
+      <div class="bn-item" onclick="goTo('ai')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9h.01M15 9h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg><span class="bn-lbl">Hubby</span></div>
+      <div class="bn-item" onclick="goTo('feed')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg><span class="bn-lbl">Feed</span></div>
+    </div>
+  </div>
+
+  <!-- ══ TIMETABLE ══ -->
+  <div class="screen" id="screen-timetable">
+    <div class="top-bar">
+      <div class="tb-greeting">
+        <div class="tb-name">Timetable</div>
+        <div class="tb-sub">CSC 300 — Computer Science</div>
+      </div>
+      <div class="tb-icons">
+        <div class="icon-btn" onclick="goTo('notif')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div class="notif-dot"></div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll" style="padding-bottom:8px;">
+      <div class="content">
+        <div class="day-tabs">
+          <div class="day-tab">Mon</div>
+          <div class="day-tab active">Tue</div>
+          <div class="day-tab">Wed</div>
+          <div class="day-tab">Thu</div>
+          <div class="day-tab">Fri</div>
+        </div>
+        <div class="card">
+          <div class="class-item">
+            <div class="class-time"><div class="ct-t">9:00</div><div class="ct-a">AM</div></div>
+            <div class="class-bar" style="background:var(--green)"></div>
+            <div class="class-info"><div class="class-name">MTH 301 · Calculus III</div><div class="class-meta">Room 110 · Dr. Adewale · Tue & Thu</div></div>
+            <span class="badge b-now">NOW</span>
+          </div>
+          <div class="class-item">
+            <div class="class-time"><div class="ct-t">10:00</div><div class="ct-a">AM</div></div>
+            <div class="class-bar" style="background:var(--red)"></div>
+            <div class="class-info"><div class="class-name">CSC 301 · Data Structures</div><div class="class-meta">Room 201 · Dr. Okafor · Tue & Wed</div></div>
+            <span class="badge b-cancelled">CANCELLED</span>
+          </div>
+          <div class="class-item">
+            <div class="class-time"><div class="ct-t">12:00</div><div class="ct-a">PM</div></div>
+            <div class="class-bar" style="background:var(--blue)"></div>
+            <div class="class-info"><div class="class-name">CSC 303 · Comp. Networks</div><div class="class-meta">LT4 · Prof. Adeyemi · Mon, Wed & Fri</div></div>
+            <span class="badge b-next">NEXT</span>
+          </div>
+          <div class="class-item">
+            <div class="class-time"><div class="ct-t">2:00</div><div class="ct-a">PM</div></div>
+            <div class="class-bar" style="background:var(--border)"></div>
+            <div class="class-info"><div class="class-name">CSC 305 · Software Eng.</div><div class="class-meta">Room 105 · Dr. Eze · Tue & Fri</div></div>
+            <span class="badge b-upcoming">UPCOMING</span>
+          </div>
+          <div class="class-item">
+            <div class="class-time"><div class="ct-t">4:00</div><div class="ct-a">PM</div></div>
+            <div class="class-bar" style="background:var(--border)"></div>
+            <div class="class-info"><div class="class-name">CSC 307 · Database Sys.</div><div class="class-meta">LT2 · Dr. Nwosu · Mon & Tue</div></div>
+            <span class="badge b-upcoming">UPCOMING</span>
+          </div>
+        </div>
+        <div class="alert-banner">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-text"><strong>CSC 301 Cancelled Today</strong>Your class rep cancelled this class. No makeup class scheduled yet.</div>
+        </div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="bn-item" onclick="goTo('home')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="bn-lbl">Home</span></div>
+      <div class="bn-item active" onclick="goTo('timetable')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="bn-lbl">Timetable</span></div>
+      <div class="bn-item" onclick="goTo('ai')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9h.01M15 9h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg><span class="bn-lbl">Hubby</span></div>
+      <div class="bn-item" onclick="goTo('feed')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg><span class="bn-lbl">Feed</span></div>
+    </div>
+  </div>
+
+  <!-- ══ HUBBY AI ══ -->
+  <div class="screen" id="screen-ai">
+    <div class="ai-header">
+      <h2>🤖 Hubby</h2>
+      <p>Ask me anything about your schedule, hall, or campus</p>
+    </div>
+    <div class="ai-chips" id="chips">
+      <div class="ai-chip" onclick="sendChip(this,'What classes do I have today?')">What classes do I have today?</div>
+      <div class="ai-chip" onclick="sendChip(this,'Any cancellations?')">Any cancellations?</div>
+      <div class="ai-chip" onclick="sendChip(this,'What's due soon?')">What's due soon?</div>
+    </div>
+    <div class="chat-area" id="chat-messages"></div>
+    <div class="chat-input-area">
+      <input class="chat-input" id="chat-input" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="chat-send" onclick="sendMsg()">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+      </button>
+    </div>
+    <div class="bnav">
+      <div class="bn-item" onclick="goTo('home')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="bn-lbl">Home</span></div>
+      <div class="bn-item" onclick="goTo('timetable')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="bn-lbl">Timetable</span></div>
+      <div class="bn-item active" onclick="goTo('ai')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9h.01M15 9h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg><span class="bn-lbl">Hubby</span></div>
+      <div class="bn-item" onclick="goTo('feed')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg><span class="bn-lbl">Feed</span></div>
+    </div>
+  </div>
+
+  <!-- ══ FEED ══ -->
+  <div class="screen" id="screen-feed">
+    <div class="top-bar">
+      <div class="tb-greeting"><div class="tb-name">Feed</div><div class="tb-sub">Announcements & Events</div></div>
+    </div>
+    <div class="scroll" style="padding-bottom:8px;">
+      <div class="content">
+        <div class="feed-filter">
+          <div class="filter-chip active">All</div>
+          <div class="filter-chip">Announcements</div>
+          <div class="filter-chip">Events</div>
+          <div class="filter-chip">Assignments</div>
+        </div>
+        <div class="card">
+          <div class="ann-item">
+            <div class="ann-header">
+              <span class="ann-source src-class">CSC 300 · Class Rep</span>
+              <span class="ann-time">2 hrs ago</span>
+              <span class="badge b-assign" style="margin-left:4px;">ASSIGNMENT</span>
+            </div>
+            <div class="ann-title">Lab Report 2 — Due Today</div>
+            <div class="ann-body">Lab Report 2 is due <strong>today at 11:59 PM</strong>. Submit on Google Classroom. Late submissions will not be accepted.</div>
+            <div class="ann-actions"><span class="feed-done">✓ Mark Done</span></div>
+          </div>
+          <div class="ann-item">
+            <div class="ann-header">
+              <span class="ann-source src-hall">Joshua Hall · Senator</span>
+              <span class="ann-time">5 hrs ago</span>
+              <span class="badge b-reminder" style="margin-left:4px;">REMINDER</span>
+            </div>
+            <div class="ann-title">Hall Inspection — Friday 7AM</div>
+            <div class="ann-body">Hall inspection is this Friday at 7:00 AM. All rooms must be clean, beds made, and no food items left in corridors. This is mandatory.</div>
+          </div>
+          <div class="ann-item">
+            <div class="ann-header">
+              <span class="ann-source src-club">Tech Club Babcock</span>
+              <span class="ann-time">Yesterday</span>
+              <span class="badge b-event" style="margin-left:4px;">EVENT</span>
+            </div>
+            <div class="ann-title">Tech Club Hackathon 2026</div>
+            <div class="ann-body">Hackathon is on <strong>March 14</strong> at the ICT Building. Open to all levels. Register before March 12. Prizes worth ₦500,000!</div>
+          </div>
+          <div class="ann-item">
+            <div class="ann-header">
+              <span class="ann-source src-school">Babcock University</span>
+              <span class="ann-time">2 days ago</span>
+              <span class="badge b-school" style="margin-left:4px;">SCHOOL</span>
+            </div>
+            <div class="ann-title">Mid-Semester Exams — March 18</div>
+            <div class="ann-body">All students are advised to check the exam timetable on the student portal. Carry your ID to all exam halls. Good luck!</div>
+          </div>
+          <div class="ann-item">
+            <div class="ann-header">
+              <span class="ann-source src-class">CSC 300 · Class Rep</span>
+              <span class="ann-time">2 days ago</span>
+              <span class="badge b-cancelled" style="margin-left:4px;">CANCELLED</span>
+            </div>
+            <div class="ann-title">CSC 301 Cancelled Tomorrow</div>
+            <div class="ann-body">CSC 301 — Data Structures is cancelled tomorrow. Dr. Okafor is unavailable. No makeup class scheduled yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="bn-item" onclick="goTo('home')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="bn-lbl">Home</span></div>
+      <div class="bn-item" onclick="goTo('timetable')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="bn-lbl">Timetable</span></div>
+      <div class="bn-item" onclick="goTo('ai')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9h.01M15 9h.01M9.5 15a3.5 3.5 0 0 0 5 0"/></svg><span class="bn-lbl">Hubby</span></div>
+      <div class="bn-item active" onclick="goTo('feed')"><div class="bn-pip"></div><svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg><span class="bn-lbl">Feed</span></div>
+    </div>
+  </div>
+
+  <!-- ══ NOTIFICATIONS ══ -->
+  <div class="screen" id="screen-notif">
+    <div class="back-bar">
+      <div class="back-btn" onclick="goTo(prevScreen)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </div>
+      <div><div class="back-title">Notifications</div></div>
+    </div>
+    <div class="scroll">
+      <div class="content">
+        <div class="section-header">Today</div>
+        <div class="card" style="padding:0 16px;">
+          <div class="notif-item unread">
+            <div class="notif-dot-icon notif-class">⚠️</div>
+            <div class="notif-text">
+              <div class="notif-title">CSC 301 Cancelled</div>
+              <div class="notif-body">Data Structures at 10:00 AM has been cancelled by your class rep.</div>
+              <div class="notif-time">2 hours ago</div>
+            </div>
+            <div class="unread-dot"></div>
+          </div>
+          <div class="notif-item unread">
+            <div class="notif-dot-icon notif-class">✅</div>
+            <div class="notif-text">
+              <div class="notif-title">Assignment Posted</div>
+              <div class="notif-body">CSC 300 class rep posted Lab Report 2 — due today at 11:59 PM.</div>
+              <div class="notif-time">3 hours ago</div>
+            </div>
+            <div class="unread-dot"></div>
+          </div>
+          <div class="notif-item unread">
+            <div class="notif-dot-icon notif-hall">🏛</div>
+            <div class="notif-text">
+              <div class="notif-title">Hall Inspection Reminder</div>
+              <div class="notif-body">Joshua Hall inspection is this Friday at 7:00 AM.</div>
+              <div class="notif-time">5 hours ago</div>
+            </div>
+            <div class="unread-dot"></div>
+          </div>
+        </div>
+        <div class="section-header" style="margin-top:12px;">Yesterday</div>
+        <div class="card" style="padding:0 16px;">
+          <div class="notif-item">
+            <div class="notif-dot-icon notif-club">🎉</div>
+            <div class="notif-text">
+              <div class="notif-title">Tech Club Event</div>
+              <div class="notif-body">Hackathon 2026 on March 14. Register before March 12!</div>
+              <div class="notif-time">Yesterday · 2:30 PM</div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-dot-icon notif-system">⏰</div>
+            <div class="notif-text">
+              <div class="notif-title">Class Starting Soon</div>
+              <div class="notif-body">CSC 303 · Computer Networks starts in 30 minutes at LT4.</div>
+              <div class="notif-time">Yesterday · 11:30 AM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ENTITY PROFILE ══ -->
+  <div class="screen" id="screen-entity">
+    <div class="back-bar">
+      <div class="back-btn" onclick="goTo('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </div>
+      <div><div class="back-title" id="entity-tb-title">CSC 300</div><div class="back-sub" id="entity-tb-sub">Class · Computer Science · 300L</div></div>
+    </div>
+    <div class="scroll">
+      <div class="entity-header">
+        <div class="entity-avatar" id="entity-icon" style="background:var(--blue-l);">📚</div>
+        <div class="entity-name" id="entity-name">CSC 300</div>
+        <div class="entity-meta" id="entity-meta">Computer Science · 300 Level</div>
+        <div class="entity-stats">
+          <div class="e-stat"><div class="e-stat-n" id="entity-followers">247</div><div class="e-stat-l">Followers</div></div>
+          <div class="e-stat"><div class="e-stat-n" id="entity-classes">5</div><div class="e-stat-l">Classes/wk</div></div>
+          <div class="e-stat"><div class="e-stat-n" id="entity-posts">3</div><div class="e-stat-l">Posts</div></div>
+        </div>
+        <button class="follow-btn following" id="follow-btn" onclick="toggleFollow()">✓ Following</button>
+      </div>
+      <div class="content">
+        <div class="card">
+          <div class="card-title">📅 Today's Classes</div>
+          <div class="class-item">
+            <div class="class-time"><div class="ct-t">10:00</div><div class="ct-a">AM</div></div>
+            <div class="class-bar" style="background:var(--red)"></div>
+            <div class="class-info"><div class="class-name">CSC 301 · Data Structures</div><div class="class-meta">Room 201 · Dr. Okafor</div></div>
+            <span class="badge b-cancelled">CANCELLED</span>
+          </div>
+          <div class="class-item">
+            <div class="class-time"><div class="ct-t">12:00</div><div class="ct-a">PM</div></div>
+            <div class="class-bar" style="background:var(--blue)"></div>
+            <div class="class-info"><div class="class-name">CSC 303 · Networks</div><div class="class-meta">LT4 · Prof. Adeyemi</div></div>
+            <span class="badge b-next">NEXT</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📢 Latest Announcements</div>
+          <div class="ann-item">
+            <div class="ann-header"><span class="ann-source src-class">Class Rep</span><span class="ann-time">2 hrs ago</span></div>
+            <div class="ann-title">CSC 301 Cancelled Today</div>
+            <div class="ann-body">Dr. Okafor is unavailable. No makeup class yet. Stay tuned for updates.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">✅ Active Assignments</div>
+          <div class="assign-item">
+            <div class="assign-left">
+              <div class="assign-title">Lab Report 2</div>
+              <div class="assign-due due-today">Due today · 11:59 PM</div>
+            </div>
+            <button class="mark-done" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓ Done':'Mark done'">Mark done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LOST & FOUND ══ -->
+  <div class="screen" id="screen-lf">
+    <div class="back-bar">
+      <div class="back-btn" onclick="goTo('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </div>
+      <div><div class="back-title">Lost & Found</div><div class="back-sub">All campus items</div></div>
+    </div>
+    <div class="scroll">
+      <div class="content">
+        <div class="lf-tabs">
+          <div class="lf-tab active" onclick="switchLfTab(this)">I Found</div>
+          <div class="lf-tab" onclick="switchLfTab(this)">I Lost</div>
+        </div>
+        <div class="card" style="padding:12px 16px;">
+          <div class="lf-item">
+            <div class="lf-img">👜</div>
+            <div class="lf-info">
+              <div class="lf-title">Black backpack — HP sticker</div>
+              <div class="lf-meta">📍 Found near Library · Mar 10</div>
+              <span class="lf-status s-unclaimed">Unclaimed</span>
+            </div>
+          </div>
+          <div class="lf-item">
+            <div class="lf-img">📱</div>
+            <div class="lf-info">
+              <div class="lf-title">iPhone 13 — cracked screen</div>
+              <div class="lf-meta">📍 Found in LT2 · Mar 9</div>
+              <span class="lf-status s-claimed">Claimed</span>
+            </div>
+          </div>
+          <div class="lf-item">
+            <div class="lf-img">🔑</div>
+            <div class="lf-info">
+              <div class="lf-title">Keys with Babcock keychain</div>
+              <div class="lf-meta">📍 Found at Cafeteria · Mar 8</div>
+              <span class="lf-status s-unclaimed">Unclaimed</span>
+            </div>
+          </div>
+          <div class="lf-item">
+            <div class="lf-img">📓</div>
+            <div class="lf-info">
+              <div class="lf-title">Blue notebook — CSC notes</div>
+              <div class="lf-meta">📍 Found at Chapel · Mar 7</div>
+              <span class="lf-status s-claimed">Claimed</span>
+            </div>
+          </div>
+        </div>
+        <button class="post-lf-btn">+ Post an item you found</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── DATE ──
+const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const now = new Date();
+const el = document.getElementById('today-date');
+if (el) el.textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+
+// ── NAVIGATION ──
+let prevScreen = 'home';
+const screens = { home:'screen-home', timetable:'screen-timetable', ai:'screen-ai', feed:'screen-feed', notif:'screen-notif', entity:'screen-entity', lf:'screen-lf' };
+const navIdx = { home:0, timetable:1, ai:2, feed:3 };
+
+function goTo(key) {
+  if (!key || !screens[key]) return;
+  const cur = document.querySelector('.screen.active');
+  if (cur) { prevScreen = cur.id.replace('screen-',''); cur.classList.remove('active'); }
+  const next = document.getElementById(screens[key]);
+  if (next) { next.classList.add('active'); next.querySelector('.scroll')?.scrollTo(0,0); }
+  document.querySelectorAll('.bn-item').forEach((el,i) => el.classList.toggle('active', i === navIdx[key]));
+}
+
+// ── DRAWER ──
+function openDrawer() {
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
+
+// ── ENTITY ──
+const entities = {
+  class: { icon:'📚', bg:'var(--blue-l)', name:'CSC 300', meta:'Computer Science · 300 Level', tb:'CSC 300', tbsub:'Class · Computer Science · 300L', followers:'247', classes:'5', posts:'3' },
+  hall:  { icon:'🏛',  bg:'var(--purple-l)', name:'Joshua Hall', meta:'Male Hall · 247 members', tb:'Joshua Hall', tbsub:'Male Hall · Babcock University', followers:'412', classes:'—', posts:'8' },
+  club:  { icon:'💻', bg:'var(--green-l)', name:'Tech Club Babcock', meta:'Technology Club · 142 members', tb:'Tech Club', tbsub:'Club · Technology', followers:'142', classes:'—', posts:'5' },
+};
+function showEntity(type) {
+  const e = entities[type];
+  document.getElementById('entity-icon').textContent = e.icon;
+  document.getElementById('entity-icon').style.background = e.bg;
+  document.getElementById('entity-name').textContent = e.name;
+  document.getElementById('entity-meta').textContent = e.meta;
+  document.getElementById('entity-tb-title').textContent = e.tb;
+  document.getElementById('entity-tb-sub').textContent = e.tbsub;
+  document.getElementById('entity-followers').textContent = e.followers;
+  document.getElementById('entity-classes').textContent = e.classes;
+  document.getElementById('entity-posts').textContent = e.posts;
+  goTo('entity');
+}
+
+let isFollowing = true;
+function toggleFollow() {
+  isFollowing = !isFollowing;
+  const btn = document.getElementById('follow-btn');
+  btn.textContent = isFollowing ? '✓ Following' : '+ Follow';
+  btn.className = 'follow-btn ' + (isFollowing ? 'following' : 'follow');
+}
+
+// ── TABS ──
+document.querySelectorAll('.day-tab').forEach(t => t.addEventListener('click', function() {
+  document.querySelectorAll('.day-tab').forEach(x => x.classList.remove('active'));
+  this.classList.add('active');
+}));
+document.querySelectorAll('.filter-chip').forEach(t => t.addEventListener('click', function() {
+  document.querySelectorAll('.filter-chip').forEach(x => x.classList.remove('active'));
+  this.classList.add('active');
+}));
+function switchLfTab(el) {
+  document.querySelectorAll('.lf-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── HUBBY AI ──
+const responses = {
+  'what classes do i have today': "Today (Tuesday) you have:
+
+📅 9:00 AM — MTH 301, Calculus III · Room 110
+❌ 10:00 AM — CSC 301, Data Structures · CANCELLED
+📅 12:00 PM — CSC 303, Networks · LT4
+📅 2:00 PM — CSC 305, Software Eng · Room 105
+📅 4:00 PM — CSC 307, Database · LT2",
+  'any cancellations': "Yes! CSC 301 — Data Structures at 10:00 AM in Room 201 was cancelled by your class rep. No makeup class has been scheduled yet. Your next class is CSC 303 at 12:00 PM in LT4. 📢",
+  "what's due soon": "You have 3 upcoming deadlines:
+
+🔴 Lab Report 2 — due TODAY at 11:59 PM (Google Classroom)
+🟡 Room Sanitation — due TOMORROW at 7:00 AM
+⚪ Hackathon Project — due Mar 14 at 6:00 PM",
+  'what time is hall inspection': "Hall inspection for Joshua Hall is this Friday at 7:00 AM. Make sure your room is clean, bed made, and no food items in corridors. No exemptions! 🏛",
+  'did my class rep cancel any lectures today': "Yes! Your class rep cancelled CSC 301 — Data Structures today at 10:00 AM. The cancellation was posted 2 hours ago. No makeup class scheduled yet. Your next class is CSC 303 at 12:00 PM in LT4. 📢",
+  'what assignments are due this week': "This week's assignments:
+
+🔴 Lab Report 2 — TODAY at 11:59 PM
+🟡 Room Sanitation Check — Tomorrow at 7:00 AM
+⚪ Hackathon Submission — Mar 14 at 6:00 PM",
+  'when is the next tech club event': "Tech Club Hackathon 2026 is on March 14 at the ICT Building, running from 9:00 AM to 6:00 PM. Registration closes March 12. Open to all levels! 💻🏆",
+};
+
+function getResponse(input) {
+  const q = input.toLowerCase().trim();
+  for (const [k, v] of Object.entries(responses)) {
+    if (q.includes(k) || k.split(' ').filter(w=>w.length>3).every(w=>q.includes(w))) return v;
+  }
+  return "Good question! I'm Hubby, your campus assistant. I can help with your timetable, assignments, announcements, and campus events. Try asking about your classes today, upcoming deadlines, or hall reminders. 🤖";
+}
+
+function addMsg(text, isUser) {
+  const msgs = document.getElementById('chat-messages');
+  const d = document.createElement('div');
+  d.className = 'chat-bubble ' + (isUser ? 'bubble-user' : 'bubble-ai');
+  d.innerHTML = text.replace(/
+/g,'<br>');
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chat-messages');
+  const d = document.createElement('div');
+  d.className = 'typing-wrap'; d.id = 'typing';
+  d.innerHTML = '<div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() { document.getElementById('typing')?.remove(); }
+
+function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  document.getElementById('chips').style.display = 'none';
+  addMsg(text, true);
+  showTyping();
+  setTimeout(() => { removeTyping(); addMsg(getResponse(text), false); }, 900 + Math.random()*500);
+}
+
+function sendChip(el, text) {
+  document.getElementById('chips').style.display = 'none';
+  addMsg(text, true);
+  showTyping();
+  setTimeout(() => { removeTyping(); addMsg(getResponse(text), false); }, 900 + Math.random()*500);
+}
+
+// ── SPLASH ──
+setTimeout(() => document.getElementById('splash').classList.add('hidden'), 1800);
+
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+}
+
+// ── INSTALL PROMPT ──
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  setTimeout(() => document.getElementById('install-banner').classList.add('show'), 3000);
+});
+document.getElementById('install-btn').addEventListener('click', () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('install-banner').classList.remove('show');
+    });
+  }
+});
+window.addEventListener('appinstalled', () => document.getElementById('install-banner').classList.remove('show'));
+</script>
+
+</body>
+</html>
