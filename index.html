@@ -784,7 +784,7 @@ html, body {
     <div class="ai-chips" id="chips">
       <div class="ai-chip" onclick="sendChip(this,'What classes do I have today?')">What classes do I have today?</div>
       <div class="ai-chip" onclick="sendChip(this,'Any cancellations?')">Any cancellations?</div>
-      <div class="ai-chip" onclick="sendChip(this,'What's due soon?')">What's due soon?</div>
+      <div class="ai-chip" onclick="sendChip(this,'Whats due soon?')">What's due soon?</div>
     </div>
     <div class="chat-area" id="chat-messages"></div>
     <div class="chat-input-area">
@@ -1124,29 +1124,28 @@ function switchLfTab(el) {
 
 // ── HUBBY AI ──
 const responses = {
-  'what classes do i have today': "Today (Tuesday) you have:
+  'what classes do i have today': `Today (Tuesday) you have:
 
 📅 9:00 AM — MTH 301, Calculus III · Room 110
 ❌ 10:00 AM — CSC 301, Data Structures · CANCELLED
 📅 12:00 PM — CSC 303, Networks · LT4
 📅 2:00 PM — CSC 305, Software Eng · Room 105
-📅 4:00 PM — CSC 307, Database · LT2",
-  'any cancellations': "Yes! CSC 301 — Data Structures at 10:00 AM in Room 201 was cancelled by your class rep. No makeup class has been scheduled yet. Your next class is CSC 303 at 12:00 PM in LT4. 📢",
-  "what's due soon": "You have 3 upcoming deadlines:
+📅 4:00 PM — CSC 307, Database · LT2`,
+  'any cancellations': `Yes! CSC 301 — Data Structures at 10:00 AM in Room 201 was cancelled by your class rep. No makeup class has been scheduled yet. Your next class is CSC 303 at 12:00 PM in LT4. 📢`,
+  "what's due soon": `You have 3 upcoming deadlines:
 
 🔴 Lab Report 2 — due TODAY at 11:59 PM (Google Classroom)
 🟡 Room Sanitation — due TOMORROW at 7:00 AM
-⚪ Hackathon Project — due Mar 14 at 6:00 PM",
-  'what time is hall inspection': "Hall inspection for Joshua Hall is this Friday at 7:00 AM. Make sure your room is clean, bed made, and no food items in corridors. No exemptions! 🏛",
-  'did my class rep cancel any lectures today': "Yes! Your class rep cancelled CSC 301 — Data Structures today at 10:00 AM. The cancellation was posted 2 hours ago. No makeup class scheduled yet. Your next class is CSC 303 at 12:00 PM in LT4. 📢",
-  'what assignments are due this week': "This week's assignments:
+⚪ Hackathon Project — due Mar 14 at 6:00 PM`,
+  'what time is hall inspection': `Hall inspection for Joshua Hall is this Friday at 7:00 AM. Make sure your room is clean, bed made, and no food items in corridors. No exemptions! 🏛`,
+  'did my class rep cancel any lectures today': `Yes! Your class rep cancelled CSC 301 — Data Structures today at 10:00 AM. The cancellation was posted 2 hours ago. No makeup class scheduled yet. Your next class is CSC 303 at 12:00 PM in LT4. 📢`,
+  'what assignments are due this week': `This week's assignments:
 
 🔴 Lab Report 2 — TODAY at 11:59 PM
 🟡 Room Sanitation Check — Tomorrow at 7:00 AM
-⚪ Hackathon Submission — Mar 14 at 6:00 PM",
-  'when is the next tech club event': "Tech Club Hackathon 2026 is on March 14 at the ICT Building, running from 9:00 AM to 6:00 PM. Registration closes March 12. Open to all levels! 💻🏆",
+⚪ Hackathon Submission — Mar 14 at 6:00 PM`,
+  'when is the next tech club event': `Tech Club Hackathon 2026 is on March 14 at the ICT Building, running from 9:00 AM to 6:00 PM. Registration closes March 12. Open to all levels! 💻🏆`,
 };
-
 function getResponse(input) {
   const q = input.toLowerCase().trim();
   for (const [k, v] of Object.entries(responses)) {
@@ -1159,8 +1158,8 @@ function addMsg(text, isUser) {
   const msgs = document.getElementById('chat-messages');
   const d = document.createElement('div');
   d.className = 'chat-bubble ' + (isUser ? 'bubble-user' : 'bubble-ai');
-  d.innerHTML = text.replace(/
-/g,'<br>');
+  // Fixed the regex to correctly replace newlines with <br> tags
+  d.innerHTML = text.replace(/\n/g, '<br>');
   msgs.appendChild(d);
   msgs.scrollTop = msgs.scrollHeight;
 }
